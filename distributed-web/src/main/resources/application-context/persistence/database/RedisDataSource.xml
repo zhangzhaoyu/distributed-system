@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-4.0.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:property-placeholder
+            location="classpath:/properties/service.bus.redis.properties" ignore-unresolvable="true" order="1"/>
+
+    <bean id="serviceBusJedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig"
+          p:maxTotal="${service.bus.redis.pool.maxTotal}"
+          p:maxIdle="${service.bus.redis.pool.maxIdle}"
+          p:minIdle="${service.bus.redis.pool.minIdle}"
+          p:maxWaitMillis="${service.bus.redis.pool.maxWaitMillis}"
+          p:minEvictableIdleTimeMillis="${service.bus.redis.pool.minEvictableIdleTimeMillis}"
+          p:numTestsPerEvictionRun="${service.bus.redis.pool.numTestsPerEvictionRun}"
+          p:timeBetweenEvictionRunsMillis="${service.bus.redis.pool.timeBetweenEvictionRunsMillis}"
+          p:testOnBorrow="${service.bus.redis.pool.testOnBorrow}"
+          p:testOnReturn="${service.bus.redis.pool.testOnReturn}"
+          p:testWhileIdle="${service.bus.redis.pool.testWhileIdle}" />
+
+    <bean id="serviceBusJedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+          p:hostName="${service.bus.redis.hostName}"
+          p:port="${service.bus.redis.port}"
+          p:password="${service.bus.redis.password}"
+          p:usePool="true"
+          p:poolConfig-ref="serviceBusJedisPoolConfig"
+          p:timeout="${service.bus.redis.timeout}"/>
+    <!-- redis template definition -->
+    <bean id="serviceBusRedisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
+          p:connectionFactory-ref="serviceBusJedisConnectionFactory"
+          p:enableTransactionSupport="true" />
+
+    <!--p:keySerializer="org.springframework.data.redis.serializer.StringRedisSerializer"
+    p:hashKeySerializer="org.springframework.data.redis.serializer.StringRedisSerializer"
+    p:valueSerializer="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"
+    p:hashValueSerializer="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"-->
+
+    <!--<bean id="redisSerializer" class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"></bean>-->
+</beans>

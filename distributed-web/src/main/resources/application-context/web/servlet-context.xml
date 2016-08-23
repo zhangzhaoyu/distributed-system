@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+             http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd              
+                         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+
+    <!-- Enables the Spring MVC @Controller programming model -->
+    <!-- 下面标签内建的就是 FormattingConversionServiceFactoryBean 所以 Spring MVC 对处理方法的入参绑定就支持注解驱动的功能-->
+    <context:component-scan base-package="org.zzy.distributed.web"/>
+    <!-- 该标签会默认配置 DefaultAnnotationHandlerMapping 和一个 AnnotionMethodHandlerAdapter
+        同时还会注册一个默认的ConversionService 即FormattingConversionServiceFactoryBean
+        LocalValidatorFactoryBean
+     -->
+    <mvc:annotation-driven>
+        <!-- 处理responseBody 里面日期类型 -->
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <!--<property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />
+                            </bean>
+                        </property>
+                    </bean>
+                </property>-->
+            </bean>
+            <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+                <property name="marshaller" ref="xStreamMarshaller" />
+                <property name="unmarshaller" ref="xStreamMarshaller" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="xStreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+        <property name="autodetectAnnotations" value="true"></property>
+    </bean>
+    <!--  静态资源的处理 提供 rest 风格的URL 提供可能	cache-period 静态资源在客户浏览器的缓存时间 -->
+    <mvc:resources mapping="/public/**" location="/public/" cache-period="31536000"/>
+    <!--
+        - Message source for this context, loaded from localized "messages_xx" files.
+        - Files are stored inside src/main/resources
+    
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">-->
+
+    <!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- CommonsMultipartResolver 默认没有文件上传解析器 -->
+   <!-- <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="1024000000"></property>
+    </bean>-->
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <property name="messageConverters">
+            <list>
+                <bean id="jsonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+                <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter"/>
+                <bean id="formHttpMessageConverter" class="org.springframework.http.converter.FormHttpMessageConverter"/>
+                <!--<bean id="xmlHttpMessageConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <!-- 定义异常处理页面  对应view 下面的outException.jsp-->
+    <!--<bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="java.sql.SQLException">exception</prop>
+                <prop key="java.io.IOException">exception</prop>
+            </props>
+        </property>
+    </bean>-->
+    <!-- Spring MVC HttpMessageConverter<T> 自定义之后则覆盖默认的值-->
+    <!-- <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters" ref="messageConverters" />
+    </bean>
+    默认配置以下四个
+    <util:list id="messageConverters">
+        <bean class="org.springframework.http.converter.BufferedImageHttpMessageConverter" />
+        <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+        <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
+        <bean class="org.springframework.http.converter.xml.XmlAwareFormHttpMessageConverter" />
+        <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+    </util:list> -->
+</beans>

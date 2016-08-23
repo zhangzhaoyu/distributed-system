@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://activemq.apache.org/schema/core
+       http://activemq.apache.org/schema/core/activemq-core-5.11.1.xsd
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       http://www.springframework.org/schema/jms
+       http://www.springframework.org/schema/jms/spring-jms-4.0.xsd">
+
+    <context:property-placeholder location="classpath:/properties/device.bus.service.properties" ignore-unresolvable="true"
+                                  order="4"/>
+    <!--jms factory-->
+    <amq:connectionFactory id="antennaServiceConnectionFactory"
+                           brokerURL="tcp://${device.bus.jms.broker.url}:${device.bus.jms.broker.port}"
+                           clientID="${device.bus.jms.clientId}"/>
+    <bean id="antennaServiceJmsQueueConnectionFactory"
+          class="org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter">
+        <property name="targetConnectionFactory" ref="antennaServiceConnectionFactory"/>
+        <!--<property name="username" value="${mq.username}"/>-->
+    </bean>
+    <bean id="antennaServiceJmsConnectionFactory"
+          class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="antennaServiceJmsQueueConnectionFactory"/>
+        <property name="sessionCacheSize" value="50"/>
+        <!--<property name="exceptionListener" ref="jmsExceptionListener"/>-->
+    </bean>
+
+    <!--jms-clients-->
+    <bean id="deviceBusService" class="org.springframework.jms.remoting.JmsInvokerProxyFactoryBean">
+        <property name="connectionFactory" ref="antennaServiceJmsConnectionFactory" />
+        <property name="queueName" value="${device.bus.jms.queue.service.bus}.DeviceBusService" />
+        <property name="serviceInterface" value="com.ani.bus.device.application.service.DeviceBusService" />
+    </bean>
+</beans>

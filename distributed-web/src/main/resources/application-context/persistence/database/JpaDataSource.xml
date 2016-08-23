@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+    http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+    http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+    http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
+    http://www.springframework.org/schema/data/repository http://www.springframework.org/schema/data/repository/spring-repository-1.5.xsd">
+
+    <!-- SQL Config -->
+    <context:property-placeholder location="classpath:properties/service.bus.jpa.properties"  ignore-unresolvable="true" order="0"/>
+    <!-- 定义数据源Bean -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <!-- 连接数据库的驱动 -->
+        <property name="driverClass" value="${jdbc.driverClass}"/>
+        <!-- 连接数据库的url -->
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <!-- 数据库的账号 -->
+        <property name="user" value="${jdbc.username}"/>
+        <!-- 数据库的密码 -->
+        <property name="password" value="${jdbc.password}"/>
+        <!-- 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数 -->
+        <property name="acquireIncrement" value="${c3p0.acquireIncrement}"/>
+        <!-- 初始化连接池时连接的数量 -->
+        <property name="initialPoolSize" value="${c3p0.initialPoolSize}"/>
+        <!-- 连接池中保留的最小连接数 -->
+        <property name="minPoolSize" value="${c3p0.minPoolSize}"/>
+        <!-- 连接池中保留的最大连接数  -->
+        <property name="maxPoolSize" value="${c3p0.maxPoolSize}"/>
+        <!-- 控制数据源内加载的PreparedStatements数量 -->
+        <property name="maxStatements" value="${c3p0.maxStatements}"/>
+        <!-- 定义连接最大空闲时间,多长时间内连接未使用则连接被丢弃 -->
+        <property name="maxIdleTime" value="${c3p0.maxIdleTime}"/>
+        <!-- 多长时间检查所有连接池中的空闲连接 -->
+        <property name="idleConnectionTestPeriod" value="${c3p0.idleConnectionTestPeriod}"/>
+        <!-- 定义在从数据库获取新连接失败后重复尝试的次数 -->
+        <property name="acquireRetryAttempts" value="${c3p0.acquireRetryAttempts}"/>
+        <!-- 获取连接失败后该数据源将申明已断开并永久关闭 -->
+        <property name="breakAfterAcquireFailure" value="${c3p0.breakAfterAcquireFailure}"/>
+        <!-- 每个connection提交的时候是否校验其有效性 -->
+        <property name="testConnectionOnCheckout" value="${c3p0.testConnectionOnCheckout}"/>
+    </bean>
+
+    <bean id="accountDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <!-- 连接数据库的驱动 -->
+        <property name="driverClass" value="${account.jdbc.driverClass}"/>
+        <!-- 连接数据库的url -->
+        <property name="jdbcUrl" value="${account.jdbc.url}"/>
+        <!-- 数据库的账号 -->
+        <property name="user" value="${account.jdbc.username}"/>
+        <!-- 数据库的密码 -->
+        <property name="password" value="${account.jdbc.password}"/>
+        <!-- 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数 -->
+        <property name="acquireIncrement" value="${c3p0.acquireIncrement}"/>
+        <!-- 初始化连接池时连接的数量 -->
+        <property name="initialPoolSize" value="${c3p0.initialPoolSize}"/>
+        <!-- 连接池中保留的最小连接数 -->
+        <property name="minPoolSize" value="${c3p0.minPoolSize}"/>
+        <!-- 连接池中保留的最大连接数  -->
+        <property name="maxPoolSize" value="${c3p0.maxPoolSize}"/>
+        <!-- 控制数据源内加载的PreparedStatements数量 -->
+        <property name="maxStatements" value="${c3p0.maxStatements}"/>
+        <!-- 定义连接最大空闲时间,多长时间内连接未使用则连接被丢弃 -->
+        <property name="maxIdleTime" value="${c3p0.maxIdleTime}"/>
+        <!-- 多长时间检查所有连接池中的空闲连接 -->
+        <property name="idleConnectionTestPeriod" value="${c3p0.idleConnectionTestPeriod}"/>
+        <!-- 定义在从数据库获取新连接失败后重复尝试的次数 -->
+        <property name="acquireRetryAttempts" value="${c3p0.acquireRetryAttempts}"/>
+        <!-- 获取连接失败后该数据源将申明已断开并永久关闭 -->
+        <property name="breakAfterAcquireFailure" value="${c3p0.breakAfterAcquireFailure}"/>
+        <!-- 每个connection提交的时候是否校验其有效性 -->
+        <property name="testConnectionOnCheckout" value="${c3p0.testConnectionOnCheckout}"/>
+    </bean>
+    <!-- Spring 提供的JdbcTemplate 方式连接数据库 -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+    </bean>
+    <!-- SQL Config -->
+    <!-- JPA实体管理工厂的配置 -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
+        <!--待扫描的实体类包，不再需要persistence.xml了-->
+        <property name="packagesToScan" >
+            <list>
+                <value>com.ani.bus.service.core.infrastructure.persistence.domain</value>
+            </list>
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.max_fetch_depth">0</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.use_sql_comments">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <!-- 开启查询缓存 -->
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <!-- 开启二级缓存 -->
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <!-- 高速缓存提供程序 -->
+                <!-- 由于spring也使用了Ehcache, 保证双方都使用同一个缓存管理器 -->
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</prop>
+            </props>
+        </property>
+        <!-- <property name="persistenceUnitName" value="SimplePU" /> -->
+    </bean>
+    <!--
+    	 query-lookup-strategy
+    	 (1) create 通过解析方法名字来创建查询。即使有符合的命名查询，或者方法通过 @Query 指定的查询语句，都将会被忽略。
+    	 (2) create-if-not-found 如果方法通过 @Query 指定了查询语句，则使用该语句实现查询；如果没有，则查找是否定义了
+    	 	符合条件的命名查询，如果找到，则使用该命名查询；如果两者都没有找到，则通过解析方法名字来创建查询。
+    	 	这是 query-lookup-strategy 属性的默认值。
+    	 (3) use-declared-query  如果方法通过 @Query 指定了查询语句，则使用该语句实现查询；如果没有，则查找是否定义了符
+    	 	合条件的命名查询，如果找到，则使用该命名查询；如果两者都没有找到，则抛出异常。
+     -->
+    <jpa:repositories base-package="com.ani.bus.service.core.infrastructure.persistence.repository" entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager" repository-impl-postfix="Impl" >
+    </jpa:repositories>
+    <!--指定实现JPA的适配器-->
+    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect" />
+    </bean>
+    <!--
+    Spring 将事务管理委托给底层具体的持久化实现框架完成。因为Spring 为不同的持久化框架提供了PlatformTransactionManager
+   	 接口的实现类。
+   	 JPA ： org.springframework.orm.jpa.JpaTransactionManager
+   	 Hibernate : org.springfamework.orm.hibernate3.HibernateTransactionManager
+   	 JDBC iBatis : org.springframework.jdbc.datasource.DataSourceTransactionManager
+   	 jdo : org.springframework.orm.jdo.JdoTransactionManager
+   	 具有多个数据源的全局事务使用（不管采用何种持久化技术）
+   	 org.springframework.transaction.jta.JtaTransactionManager
+     -->
+    <!-- Jpa 事务配置 -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+    <!-- Spring Data Jpa配置 -->
+
+    <!-- 使用annotation定义事务
+    	 proxy-target-class : true 说明用子类代理 需要cglib.jar
+    	 proxy-target-class : false 基于接口的动态代理 @Transaction 需要标注在业务实现类上，因为注解不能被继承
+     -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false" />
+
+    <!-- JSR303 Validator定义 -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+    <!-- 将@Repository 注解的Dao 的异常翻译为Spring 的DataAccessException 异常，否则世界抛出hibernate 的Exception -->
+    <bean id="persistenceExceptionTranslationPostProcessor"
+          class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+    <!-- To translate any MongoExceptions thrown in @Repository annotated classes -->
+    <context:annotation-config />
+
+    <!-- redis config
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="1000" />
+        <property name="maxIdle" value="10" />
+        <property name="minIdle" value="1" />
+        <property name="maxWaitMillis" value="15000"></property>
+        <property name="minEvictableIdleTimeMillis" value="300000"></property>
+        <property name="numTestsPerEvictionRun" value="3"></property>
+        <property name="timeBetweenEvictionRunsMillis" value="60000"></property>
+    </bean>
+    <bean id="jedisConnectionFactory"
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+          destroy-method="destroy">
+        <property name="poolConfig" ref="jedisPoolConfig"></property>
+        <property name="hostName" value="127.0.0.1"></property>
+        <property name="port" value="6379"></property>
+        <property name="password" value="0123456"></property>
+        <property name="timeout" value="15000"></property>
+        <property name="usePool" value="true"></property>
+    </bean>
+    <bean id="jedisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory"></property>
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+        </property>
+    </bean>
+    -->
+</beans>

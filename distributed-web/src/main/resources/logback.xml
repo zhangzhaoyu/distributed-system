@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60" debug="false">
+    <property name="app_name" value="default"/>
+    <contextName>${app_name}</contextName>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!--<target>System.err</target>-->
+        <encoder>
+            <!--<pattern>%-4relative %date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{56}[L:%line] - %msg%n</pattern>-->
+            <pattern>%-4relative %date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [L:%line] - %msg%n %caller{1}</pattern>
+        </encoder>
+
+    </appender>
+
+    <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>testFile.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>-->
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <logger name="org.tramp.spring4inaction" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+</configuration>
